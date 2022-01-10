@@ -1,5 +1,6 @@
 require "spec_helper"
 require "signup"
+require_relative "./support/fake_logger"
 
 describe Signup do
   describe "#save" do
@@ -7,7 +8,7 @@ describe Signup do
       it "creates an account with one user" do
         account = stub_valid(Account)
         stub_valid(User)
-        logger = stub_logger
+        logger = FakeLogger.new
         signup = Signup.new(
           logger: logger,
           email: "user@example.com",
@@ -19,8 +20,7 @@ describe Signup do
         expect(Account).to have_received(:create!).with(name: "Example")
         expect(User).to have_received(:create!).
           with(account: account, email: "user@example.com")
-        expect(logger).to have_received(:info).
-          with("Created user user@example.com with account Example")
+        expect(logger.messages[:debug].first).to eq("Created user user@example.com with account Example")
         expect(result).to be(true)
       end
     end
@@ -29,7 +29,7 @@ describe Signup do
       it "logs an error message" do
         stub_invalid(Account, message: "Name is already taken")
         stub_valid(User)
-        logger = stub_logger
+        logger = FakeLogger.new
         signup = Signup.new(
           logger: logger,
           email: "user@example.com",
@@ -38,7 +38,7 @@ describe Signup do
 
         result = signup.save
 
-        expect(logger).to have_received(:error).with("Name is already taken")
+        expect(logger.messages[:fatal].first).to eq("Name is already taken")
         expect(result).to be(false)
       end
     end
@@ -47,7 +47,7 @@ describe Signup do
       it "logs an error message" do
         stub_valid(Account)
         stub_invalid(User, message: "Email is already taken")
-        logger = stub_logger
+        logger = FakeLogger.new
         signup = Signup.new(
           logger: logger,
           email: "user@example.com",
@@ -56,7 +56,7 @@ describe Signup do
 
         result = signup.save
 
-        expect(logger).to have_received(:error).with("Email is already taken")
+        expect(logger.messages[:fatal].first).to eq("Email is already taken")
         expect(result).to be(false)
       end
     end

@@ -11,10 +11,10 @@ class Signup
   def save
     account = Account.create!(name: @account_name)
     User.create!(account: account, email: @email)
-    @logger.info("Created user #{@email} with account #{@account_name}")
+    @logger.debug("Created user #{@email} with account #{@account_name}")
     true
   rescue StandardError => error
-    @logger.error(error.message)
+    @logger.fatal(error.message)
     false
   end
 end
