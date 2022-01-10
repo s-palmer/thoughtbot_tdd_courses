@@ -11,7 +11,10 @@ class Signup
 
   def save
     account = Account.create!(name: @account_name)
-    User.create!(account: account, email: @email)
+    user = User.create!(account: account, email: @email)
+    mailer = SignupMailer.signup(account: account, user: user)
+    mailer.deliver
+    @logger.info "Delivered message: #{mailer.subject}"
     true
   end
 end
