@@ -15,4 +15,4 @@ bundle install
 
 # Add bin to path if using thoughtbot dotfiles:
 # http://goo.gl/CPzari
-mkdir .git/safe
+# mkdir .git/safe
